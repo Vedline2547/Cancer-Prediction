@@ -390,10 +390,6 @@ X_test = scaler.transform(X_test)
 
 # MODEL BUILDING 7
 # Optuna tuning for class-weighted XGBoost (optimize macro-F1)
-
-# ----------------------
-# Prepare encoded labels
-# ----------------------
 le = LabelEncoder()
 le.fit(y_train)               # fit encoder on training labels
 y_train_enc = le.transform(y_train)
@@ -481,8 +477,15 @@ print("\nFINAL Test Classification Report (class-weighted XGB):")
 print(classification_report(y_test_orig, y_test_pred, labels=le.classes_))
 print("Confusion Matrix (rows=true, cols=pred):")
 print(confusion_matrix(y_test_orig, y_test_pred, labels=le.classes_))
-# DECIDED TO GO WITH THIS MODEL
+# SAVE MODEL AND PREPROCESSING OBJECTS
 import joblib
-joblib.dump(final_xgb,'model_xgb_new.pkl')
+artifact = {
+    'model': final_xgb,
+    'scaler': scaler,
+    'label_encoder': le,
+    'feature_names': X.columns.tolist()
+}
 
-print("Model saved successfully as 'model_xgb_new.pkl'")
+joblib.dump(artifact, 'model_xgb_new.pkl')
+print("Model and preprocessing objects saved successfully!")
+
